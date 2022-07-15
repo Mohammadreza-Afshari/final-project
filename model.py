@@ -16,6 +16,12 @@ X = np.array(X)
 y = np.array(y)
 X_train, X_test, Y_train, Y_test = train_test_split(X,y,test_size=0.1)
 X_train, X_val, Y_train,Y_val = train_test_split(X_train,Y_train,test_size=0.1)
+
+
+
+
+'''
+# cnn
 # adding number of channels to our data ( so far the data is: [# of segments,# coefs])
 X_train = X_train[...,np.newaxis]
 X_test = X_test[...,np.newaxis]
@@ -88,3 +94,53 @@ print(accuracy)
 
 #save model
 model.save('model1.h5')
+'''
+
+
+
+
+
+
+
+
+
+
+# RNN-LSTM model 
+input_shape = (X_train.shape[1], X_train.shape[2])  # ( # of segments, # of coefs, # of channels)
+learning_rate = 0.0001
+
+model = keras.Sequential()
+# seq-to-seq
+model.add(keras.layers.LSTM(64, input_shape=input_shape, return_sequences=True))
+model.add(keras.layers.LSTM(64))
+model.add(keras.layers.Dense(64,activation='relu'))
+model.add(keras.layers.Dropout(0.3))
+#softmax
+model.add(keras.layers.Dense(10,activation='softmax'))
+#compile
+optimiser = keras.optimizers.Adam(learning_rate)
+model.compile(optimizer = optimiser, loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+
+model.summary()
+
+
+
+
+#********* train the model
+model.fit(X_train, Y_train, epochs = 30, batch_size = 32, validation_data = (X_val,Y_val))
+
+loss = pd.DataFrame(model.history.history)
+loss.plot()
+
+#********* model performance
+loss , accuracy = model.evaluate(X_test,Y_test)
+print('test error:',end=' ')
+print(loss)
+print('test accuracy: ',end='')
+print(accuracy)
+
+#save model
+model.save('rnnmodel.h5')
+
+
+

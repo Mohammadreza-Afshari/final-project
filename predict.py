@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 mapping = ['down' , 'off' , 'on' , 'no' , 'yes' , 'stop' , 'up' , 'right' , 'left' , 'go']
 
 #load the model
-model = keras.models.load_model('model.h5')
+model = keras.models.load_model('rnnmodel.h5')
 
 def predict(filepath):
     signal, sr = librosa.load(filepath)
@@ -17,7 +17,7 @@ def predict(filepath):
     plt.imshow(librosa.power_to_db(mfcc.T**2))
     
     #  (# of samples, # of segments, # of coefs, # of channels)
-    mfcc = mfcc[np.newaxis, ... ,np.newaxis]
+    mfcc = mfcc[np.newaxis, ... ]
     preds = model.predict(mfcc)
     idx = np.argmax(preds)
     print('predicted keyword is ',end='')
@@ -25,7 +25,7 @@ def predict(filepath):
     
 
 
-predict('test/right.wav')
+predict('test/go.wav')
    
 
 
